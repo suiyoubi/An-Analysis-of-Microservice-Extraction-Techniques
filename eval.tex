@@ -1,0 +1,69 @@
+\section{Evaluation Methodology}
+\label{sec:eval}
+Our investigation is guided by the following research questions:
+
+\noindent 
+{\bf RQ:} To what degree do the results of extraction share similarity with the actual extraction spit by experts?
+
+To answer these research questions, we first identify existing extraction techniques and choose two prominent techniques among the variety. We then choose open source projects that have both monolithic and microservice versions as our subjects. We produce the desired inputs for these tools and analyze the results performing on these subjects. We measure the similarity between the results produced by each extraction technique and the microservice version using a widely-used measure in software clustering called MoJoFM \cite{Wen:Tzerpos:2004}.
+
+\subsection{Tools}
+\jr{Describe the selected microservice extraction tools: \bn and \fs. 
+How selected, why, and what they do. }
+
+For our comparative analysis, we have selected the following two microservice extraction techniques:
+\begin{itemize}
+    \item \fs
+    \item \bn
+\end{itemize}
+
+\textbf{\bn} is a static analysis aided approach for clustering existing software. \bn relies on static analysis tools to transform the source code into a directed graph, which includes all the modules in the software system and the set of dependencies that exist between the modules. \bn uses heuristic algorithms to find a partitioning of the system into clusters that maximize an objective function. It starts with a set of randomly selected initial partitioning. By generating neighbour partitioning from existing states, \bn compares the value of the objective function and continues the iteration until a better neighbour partition cannot be found.
+
+The objective function, named as Modularization Quality (MQ), is designed to reward the creation of highly cohesive clusters that are not coupled excessively. It is defined as $MQ = \sum_{i=1}^{k}CF_i$. $k$ is the number of clusters of the partition. $CF_i$ represents the \textit{cluster factor} of the $i$th cluster in the partition, which is used to quantify the cohesion and coupling:
+\[
+   CF_i= 
+\begin{dcases}
+    0,              & \mu_i = 0  \\
+    \frac{2\mu_i}{2\mu_i + \sum_{j=1, j \neq i}^{k}(\epsilon_{i,j} + \epsilon_{j, i})},              & \text{otherwise}
+\end{dcases}
+\]
+
+$\mu_i$ is the total weights of internal edges of cluster $i$, or the number of internal edges if weight is not specified. $\epsilon_{i,j}$ is the weight (1 if weight is not specified) of the edge crossing from cluster $i$ to cluster $j$, while $\epsilon_{j,i}$ is the weight of the edge crossing from cluster $j$ to cluster $i$.
+
+\bn provides a set of algorithms that can be applied in order to find the maximum value of the objective function. By default, it uses the hill-climbing algorithm. Hill-climbing is the iterative search algorithm that starts with an arbitrary solution to a problem, then attempts to find a better solution by making an incremental change to the solution. The incremental change in \bn is done by moving one node in a cluster to either another existing cluster or a new cluster. \bn uses a threshold parameter of $\eta$ to specify the minimum number of neighbours that must be considered during each iteration. Under $\eta = 0$ condition, \bn chooses an arbitrarily neighbour that has better MQ value than the current state has. Under $\eta = 100\%$ condition, \bn chooses the neighbour that has the best MQ value among all possible neighbours to be the next state. For our comparative analysis, we have considered both the cases along with the suggested $\eta = 75\%$ value to obtain the most accurate clustering that this technique can provide. In addition, since the hill-climbing algorithm only guarantees to find the local optima and the result is highly determined by the initial state, \bn uses a set of initial states of random partitions to mitigate the limitation.
+% [Add a paragraph about genetic algorithm if we want to compare the results as well]
+
+
+\subsection{Subjects}
+
+[Apps: How selected, why, and what they do.]
+
+In this section, we describe the benchmarks that we have chosen.
+We have selected three open source projects for the comparative analysis:
+\begin{itemize}
+    \item Parts Unlimited MRP
+    \item JPetStore
+    \item Everest
+\end{itemize}
+The main reason for choosing these projects as benchmarks is because they have both monolithic and microservice versions. The monolithic version is the experimental object that we apply extraction techniques to. We consider the microservice versions as "ground-truth" because they reflect the practical splitting approaches by experts. By comparing the extracted results with the existing microservice system, we can validate the correctness as well as the weakness of individual technique.
+
+In our comparative analysis, we only validate the back end component of the system. \fs can only cluster the back end traces, and it is difficult for any static analysis tool to understand the dependencies between the back end and the front end. Therefore, \bn is also unable to generate satisfactory results by inputting an incomplete module dependency graph.
+
+\textbf{Parts Unlimited MRP} is the fictional outsourced Manufacturing Resource Planning (MRP) application. The application is developed and maintained by Microsoft, and it uses entirely open-source software including Linux, Java, Apache, and MongoDB, which creates a web front end, a back end, and an integration service that aids for continuous integration development. The back end, which is the component that we analyzed, consists of five major domains: catalog, dealer, order, quote, and shipment. The application includes essential create, read, update, delete (CRUD) operations for accessing MongoDB, simple queries such as retrieve all the orders along with shipment information. The back end component of the monolithic application is a stand-alone Spring application, while the microservice consists of eight individual services: five of them each represents one domain as described earlier, one front end service, one gateway service, and one tracing service. 
+
+The two versions of the application share high similarity in functionalities regardless of the utterly different code structure of each module. All the entities remain the same between the two versions, and among the 31 API endpoints in the monolithic version, 29 endpoints can be found in the microservice version. Two of the missing endpoints come from the \textit{PingController}, which is used for connection testing. This controller does not exist in the microservice. This is due to the fact that having one controller testing the connectivity does not make sense in the context of microservice since all the services are separated.
+
+ 
+\subsection{Metrics}\label{sec:metric}
+
+[How selected, why, and what they do.]
+
+MoJoFM quantifies the difference between the cluster produced by chosen techniques and the ground-truth as operations required to transform the formal one to the latter one. The two types of operations are moves (\textit{Move}) of entities from one cluster to another cluster and merges (\textit{Join}) of clusters. The MoJoFM formula is:
+
+$MoJoFM(A, B) = (1 - \frac{mno(A, B)}{max(mno(\forall A, B))}) \times 100\%$
+
+MoJoFM is a percentile value ranged from 0\% to 100\%, where a higher value represents a higher similarity between two cluster architecture. It is non-symmetric, and $MoJoFM(A, B)$ is calculated by transforming architecture A into B, while $MoJoFM(B, A)$ is calculated by transforming architecture B into A. $mno(A, B)$ is the minimum number of operations (\textit{Move}s or \textit{Join}s) needed to transform A into B. The actual maximum distance from partition A to partition B is denoted as $max(mno(\forall A, B))$. Therefore, MoJoFM quantifies required to transform from one architecture to another, and in our analysis, it is used to measure the differences between generated clusters and the ground-truth.
+
+To measure the similarity between two microservice architecture, we generate two description files for each system, which describes each cluster and all the classes it contains. Feeding these two description files to the MoJoFM metric gives us the percentage value of the similarity between the two systems.
+
+% It is worth noting that there exist few variation of MoJo metric including MoJoFM. We finally choose to use MoJoFM due the following consideration. We only

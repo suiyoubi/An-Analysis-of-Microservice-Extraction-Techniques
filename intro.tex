@@ -1,0 +1,32 @@
+\section{Introduction}
+\label{sec:intro}
+
+\jr{Microservices are important. }
+
+As the size and complexity of modern, large-scale software applications continue to grow, an increasing number of organizations are adopting architectural strategies that better support the new scalability, deployability, and performance demands of their software systems. The microservice-based approach -- an architectural strategy that involves dividing applications into separate, independently-deployable components -- is increasingly being used as a solution to these growing needs. 
+
+
+\jr{Splitting monolith to microservices is challenging. }
+
+Despite the technique's popularity, there is a distinct lack of ubiquitous, standardized procedures to reference when splitting a monolithic application into microservices. Most proponents of this architectural style cite domain-driven and business capability-centered design as optimal approaches to monolithic decomposition 
+% \lk{INSERT CITATIONS HERE} \lk{INSERT INFO ABOUT WHAT THESE TECHNIQUES ARE ARE WHY THEY ARE CONSIDERED "OPTIMAL"}
+; however, such approaches often require significant familiarity with the structure and inner-workings of both the software system in question and the organization that manages it. For particularly large applications, the decomposition process may even entail manually sorting hundreds, if not thousands, of files, classes, and/or methods into groups -- a process that requires significant time and effort whilst being prone to the subjective architectural preferences of whomever is performing the decomposition. 
+
+\jr{Tools exist. Based on static and dynamic analysis. Discuss the theoretical differences between static and dynamic analysis. }
+
+A number of techniques have been proposed to aid splitting monolith software to microservices. We categorize these techniques into two types based on whether they require executing the program or not. Static analysis aided techniques require the source code or specific patterns observed directly from the source code, while dynamic analysis aided techniques require data generated through runtime such as tracing or logging information.
+
+\jr{Select one static and one dynamic tool. Describe the tools.} 
+
+We have carefully chosen two extraction techniques to represent the two types: \bn\cite{Mitchell:Mancoridis:2006} and \fs. \bn, one of the static analysis aided tools, uses the module dependency graph extracted from source code. On the other hand, \fs, one of the dynamic analysis aided tools, uses tracing data collected by executing the program to generate results.
+
+\jr{Compare under the common setup. Discuss the setup and evaluation subjects.} 
+
+We generated the method-level dependencies using a static analysis tool called \textsc{Understand}\cite{Scitools:Understand:2019}. The dependencies are fed into \bn to generate the extraction results. [Add sentences for FoSci Setup] In terms of evaluation, we used MoJoFM as the metric for comparing the similarity between the generated results and the actual microservice systems.
+
+\jr{Results of the analysis.} 
+
+Our results indicate that the extraction results of the selected techniques share an acceptable level of similarity between the actual microservices. The results also show that as the size of the software system expands, the selected techniques produce better results. We discuss the threats to our study's validity and several possible avenues of future research in microservice extraction. 
+
+The remainder of the paper is structured as follows. Section~\ref{sec:background} introduces the background of microservice-based application architectural principles and reasons for its adoption. Section~\ref{sec:eval} presents the extraction techniques, subjects, and metrics that we have selected for this comparative analysis. The results of the analysis are described Section~\ref{sec:results}, and lessons learned from this comparative analysis and suggestions for future work are presented in Section~\ref{sec:discussion}. Section~\ref{sec:RelatedWork} describes all related work for this comparative analysis. Finally, we present the conclusions for this comparative analysis paper in Section~\ref{sec:conclusion}, and acknowledge is provided in Section ~\ref{sec:ack}. 
+

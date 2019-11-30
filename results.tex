@@ -1,0 +1,39 @@
+\section{Results}
+\label{sec:results}
+In this section, we discuss our findings and threats to their validity.
+
+\subsection{RQ: To  what  degree  do  the  results  of  extraction  share similarity with the actual extraction spit by experts?}
+
+We assessed the similarity of the results from selected techniques and the ground-truths using MoJoFM as described in Section~\ref{sec:metric}. Table
+\ref{tab:mojo-results} provides the MoJoFM results of the three architectures against which we assessed the selected extraction techniques.
+
+\begin{table*}
+\centering
+\caption{MoJoFM results}
+\label{tab:mojo-results}
+\begin{tabular}{@{}|l|c|c|c|c|c|@{}}
+\toprule
+                  & \multicolumn{1}{l|}{Ground truth}       & \multicolumn{2}{c|}{Bunch}                                                       & \multicolumn{2}{c|}{FoSCI}                                                       \\ \midrule
+Benchmark         & \multicolumn{1}{l|}{Number of services} & \multicolumn{1}{l|}{Number of services} & \multicolumn{1}{l|}{MoJoFM Similarity} & \multicolumn{1}{l|}{Number of services} & \multicolumn{1}{l|}{MoJoFM Similarity} \\ \midrule
+JPetstore         & 3                                       & 3                                       & 66.67\%                                & 3                                       & 66.67\%                                \\ \midrule
+Everest           & 4                                       & 4                                       & 25.00\%                                & 4                                       & 22.22\%                                \\ \midrule
+PartsUnlimitedMRP & 5                                       & 7                                       & 81.98\%                                & 5                                       & 92.86\%                                \\ \bottomrule
+\end{tabular}
+\end{table*}
+
+For all the three benchmarks, Neither \bn nor \fs performs significantly better than the other. For JPetstore, the two techniques produce the same level similarity, and \bn has a slightly higher similarity value than \fs does in Everest, while \fs does a better splitting in PartsUnlimitedMRP.
+
+Due to the non-deterministic property of \bn, the clustering results vary between different runs. To illustrate the significant differences between runs, we perform a total of twenty times experiments using \bn under the same default parameters against the PartsUnlimitedMRP benchmark, and the result is shown in the figure \ref{fig:mq-vs-num-of-cluster-plot}. We plot the MQ value of the result for each run against the number of clusters. We intend to ignore the detail information, such as the internal differences of each cluster between multiple runs. If the individual differences are taken into consideration, the differences between runs would be even more substantial. The MQ values vary from 1.7 to 33.9, and the number of clusters varies from 3 to 10. For runs that have the same number of clusters, the MQ values are not in a reasonable small range, indicating the internal differences between each cluster are very huge.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\columnwidth]{images/mq-vs-num-of-cluster-plot.png}
+    \caption{\bn: A total of twenty times data against PartsUnlimitedMRP }
+    \label{fig:mq-vs-num-of-cluster-plot}
+\end{figure}
+
+We excessively test the configuration of parameters of \bn and find that the extreme instability of the results come from the incremental MQ algorithm, which is used for optimizing the time complexity of calculating MQ values during iteration. Setting the algorithm to a naive approach significantly reduces the MQ value differences between runs. For a total of ten-time runs, \bn clustered the system into seven sub-components for nine times and eight sub-components for one time, and the MQ values for each run are within $[3.90, 3.95]$. We chose the run with MQ value equals to 3.95 as the final results for \bn.
+
+In the PartsUnlimitedMRP benchmark, there exist duplicate classes when migrating from monolithic to microservice version. One main portion of such classes is exception classes. In an ideal decomposition, exception classes should be treated as "special classes" that belongs to an individual cluster, instead of grouping with other functional classes. Neither \bn nor \fs can distinguish the fundamental differences between these classes with other functional classes, and therefore, they group these exception classes with the domain that frequently uses these exceptions. 
+
+\input{threats.tex}

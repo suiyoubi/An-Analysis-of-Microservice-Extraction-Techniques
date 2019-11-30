@@ -1,0 +1,24 @@
+\subsection{Threats to Validity}
+\label{sec:threats}
+
+% Selection of tools, selection of subjects, manual interpretation of the results.
+
+Certain issues potentially undermine the validity of our results and our confidence in them. The three main aspects of issues come from the selection of tools, selection of subjects, and the non-uniqueness of the correct architecture.
+
+First, we have only selected two extraction techniques among a variety of tools that could potentially be used as software system extraction techniques. Early work by Jonas Fritzsch, Justus Bogner, Alfred Zimmermann, and Stefan Wagner defined four categories for existing extraction techniques:
+\begin{itemize}
+    \item Static Code Analysis aided approaches
+    \item Meta-Data aided approaches
+    \item Workload-Data aided approaches
+    \item Dynamic Microservice Composition approaches
+\end{itemize}
+
+
+\bn, which serves as one of the static code analysis aided approaches, uses the Module Dependency Graph extracted from source code as its input. \fs is one of the workload-data aided approaches, which focuses on using application operational data to determine a satisfactory decomposition. Our analysis does not cover the other two categories of techniques. We intentionally avoided choosing these two categories of techniques because these tools either require manually-intensive user input or do not have a result evaluation. This does not imply that these techniques cannot produce good results. Instead, it is hard to quantify all the human-involved efforts; therefore, these techniques are excluded from this comparative analysis.
+
+Second, all three subjects of this analysis are relatively small, containing less than 50 modules, and this amplifies the differences in MoJoFM values of results and the ground-truths. To illustrate this, assume the case that exact one \textit{Move} operation is required to transform the extraction result to the ground-truth. For simplicity, we assume the maximum distance between two systems equal to the number of modules. Therefore, a system with ten modules  has  MoJoFM  value  =  90\%, while system with 100 modules has MoJoFM value = 99\%. These techniques likely produce such noises; therefore, these tools do not have a high similarity with the benchmarks. 
+
+Besides, the three subjects use specific frameworks. For instance, PartsUnlimitedMRP is built on the Spring framework. This indicates that there exists dependencies from classes in the source code to the framework code and from the framework to the source code. Therefore, the dependencies of classes in the source code that are indirectly connected through the framework served as a "medium" are not considered. In other words, \bn may require additional framework-related inputs to generate more accurate results.
+
+Third, for any software system, there is no single "correct" architecture. Even if the similarity of the result and the ground-truth is relatively low, it is still possible that the result suggests a reasonable architecture, which is much different from the ground-truth. Nevertheless, in terms of performance or any other aspect, it could potentially beat the ground-truth. Due to the consideration that the complexity level for all the subjects is relatively low, the possibility of having one architecture that completely different from the ground truth performs as good as the ground truth does is also low. 
+
